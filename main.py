@@ -1,13 +1,7 @@
-# key: yi5l79SV.ueOTM1AfRlQcdsbNzCqN4mIgQRyP8R6U
+# key1: yi5l79SV.ueOTM1AfRlQcdsbNzCqN4mIgQRyP8R6U
+# key2: JI7Zs8Gl.k3ATixoz6OeIxvDgtJAhsw1LueTwgS98
 
 import requests
-
-url = "https://vision.foodvisor.io/api/1.0/en/analysis/"
-headers = {"Authorization": "Api-Key <Yyi5l79SV.ueOTM1AfRlQcdsbNzCqN4mIgQRyP8R6U>"}
-with open("pizza.jpg", "rb") as image:
-  response = requests.post(url, headers=headers, files={"image": image})
-  response.raise_for_status()
-data = response.json()
 
 # Updated Recommended Daily Amounts (RDA) for a 2000 Calorie Diet
 rda = {
@@ -41,35 +35,100 @@ rda = {
     "molybdenum_100g": 45,
 }
 
+url = "https://vision.foodvisor.io/api/1.0/en/analysis/"
+headers = {"Authorization": "Api-Key JI7Zs8Gl.k3ATixoz6OeIxvDgtJAhsw1LueTwgS98"}
+with open("pretzels.jpg", "rb") as image:
+  response = requests.post(url, headers=headers, files={"image": image})
+  response.raise_for_status()
+data = response.json()
+#print(data)
+
+# Process each item and access the first food possibility
+food = data['items'][0]['food'][0]
+food_name = food['food_info']['display_name']
+food_nut = food['food_info']['nutrition']
+# print (food_nut)
+
 # Nutritional data for the food item
 nutritional_data = {
-    "calories_100g": 0.0,
-    "proteins_100g": 0.0,
-    "fat_100g": 0.0,
-    "sat_fat_100g": 0.411,
-    "insat_fat_100g": 0.965,
-    "carbs_100g": 0.0,
-    "sugars_100g": 0.0,
-    "fibers_100g": 0.0,
-    "cholesterol_100g": 0.0294,
-    "iron_100g": 0.000946,
-    "calcium_100g": 0.0194,
-    "vitamin_c_100g": 0.0,
-    "vitamin_b9_100g": 9.2e-06,
-    "omega_3_100g": 0.01209,
-    "omega_6_100g": 0.205,
-    "sodium_100g": 0.0406,
+    "calories_100g": food_nut.get('calories_100g'),
+    "proteins_100g": food_nut.get('proteins_100g'),
+    "fat_100g": food_nut.get('fat_100g'),
+    "sat_fat_100g": food_nut.get('sat_fat_100g'),
+    "insat_fat_100g": food.get('insat_fat_100g'),
+    "carbs_100g": food.get('carbs_100g'),
+    "sugars_100g": food.get('sugars_100g'),
+    "fibers_100g": food.get('fibers_100g'),
+    "cholesterol_100g": food.get('cholesterol_100g'),
+    "iron_100g": food.get('iron_100g'),
+    "calcium_100g": food.get('calcium_100g'),
+    "vitamin_c_100g": food.get('vitamin_c_100g'),
+    "vitamin_b9_100g": food.get('vitamin_b9_100g'),
+    "omega_3_100g": food.get('omega_3_100g'),
+    "omega_6_100g": food.get('omega_6_100g'),
+    "sodium_100g": food.get('sodium_100g'),
 }
+
+# for key, value in nutritional_data.items():
+#    print(f"Key: {key}, Value: {value}")
+
 
 # Normalize and calculate the score using updated RDA values
 def calculate_nutritional_score(data, weights, rda):
     score = 0
+    recommendations = ""
+    diet_recommedations = ""
     for nutrient, weight in weights.items():
-        value = data.get(nutrient, 0)
+        value = data.get(nutrient, None)
+        if value == None:
+           value = 0
         recommended = rda.get(nutrient, 1)  # Avoid division by zero
         normalized = value / recommended
         score += weight * normalized
-    return score
+    
+    if score < 0:
+        recommendations += "Your nutritional intake is needs to be improved. Consider having a more balanced diet."
+    elif 0 <= score < 1:
+        recommendations += "Your diet may need improvement. Focus on increasing beneficial nutrients."
+    elif 1 <= score < 2:
+        recommendations += "Your diet is balanced, however there's room for improvement."
+    elif 2 <= score < 3:
+        recommendations += "Good job! You're on the right track with your nutritional choices."
+    else:
+        recommendations += "Excellent! Your dietary choices are very healthy. "
+
+    sodium = nutritional_data["sodium_100g"]
+    if sodium is None:
+        sodium = 0
+    if sodium > 2300:
+        diet_recommendations = ("This food is high in sodium. Consider reducing intake.")
+    
+    fibers = nutritional_data.get("fibers_100g", None)
+    if fibers is None:
+        fibers = 0
+    if fibers < 30:
+        diet_recommendations = ("This food is low in fiber. Try pairing it with fiber-rich foods.")
+
+    sugars = nutritional_data.get("sugars_100g", None)
+    if sugars is None:
+        sugars = 0
+    if sugars > 25:
+        diet_recommendations = ("This food has high sugar content. Aim to reduce added sugars.")
+
+    vitamin_c = nutritional_data.get("vitamin_c_100g", None)
+    if vitamin_c is None:
+        vitamin_c = 0
+    if vitamin_c == 0:
+        diet_recommendations = ("This food lacks vitamin C. Consider adding fruits or vegetables rich in vitamin C.")
+
+    calcium = nutritional_data.get("calcium_100g", None)
+    if calcium is None:
+        calcium = 0
+    if calcium < 100:
+        diet_recommendations = ("This food is low in calcium. Include dairy or fortified alternatives in your diet.")
+
+
+    return score, recommendations, diet_recommendations
 
 # Define nutrient weights (for example, positive and negative weightings)
 weights = {
@@ -91,7 +150,20 @@ weights = {
     "sodium_100g": -0.3,
 }
 
+
+print(f"Evaluating food: {food_name}")
+
+# Extract the nutritional data for the first food possibility
+# nutrients = food['food_info']['nutrition']
+
+# Calculate the nutritional score for this food item
+# food_score = calculate_nutritional_score(nutrients, weights, rda)
+
+# Print the result for this food item
+# print(f"Food: {food_name} | Nutritional Score: {food_score:.2f}")
+print("-" * 40)
+
 # Compute the score
 nutritional_score = calculate_nutritional_score(nutritional_data, weights, rda)
-print(f"Nutritional Score: {nutritional_score:.2f}")
+print(f"Nutritional Score: {nutritional_score}")
 
