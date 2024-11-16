@@ -1,4 +1,13 @@
-#here is an example coding platform for python
+# key: yi5l79SV.ueOTM1AfRlQcdsbNzCqN4mIgQRyP8R6U
+
+import requests
+
+url = "https://vision.foodvisor.io/api/1.0/en/analysis/"
+headers = {"Authorization": "Api-Key <Yyi5l79SV.ueOTM1AfRlQcdsbNzCqN4mIgQRyP8R6U>"}
+with open("pizza.jpg", "rb") as image:
+  response = requests.post(url, headers=headers, files={"image": image})
+  response.raise_for_status()
+data = response.json()
 
 # Updated Recommended Daily Amounts (RDA) for a 2000 Calorie Diet
 rda = {
