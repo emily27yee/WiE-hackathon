@@ -1,5 +1,5 @@
-# key1: yi5l79SV.ueOTM1AfRlQcdsbNzCqN4mIgQRyP8R6U
-# key2: JI7Zs8Gl.k3ATixoz6OeIxvDgtJAhsw1LueTwgS98
+# key1: ?
+# key2: ?
 
 import requests
 
@@ -36,7 +36,7 @@ rda = {
 }
 
 url = "https://vision.foodvisor.io/api/1.0/en/analysis/"
-headers = {"Authorization": "Api-Key JI7Zs8Gl.k3ATixoz6OeIxvDgtJAhsw1LueTwgS98"}
+headers = {"Authorization": "Api-Key ?"}
 with open("pretzels.jpg", "rb") as image:
   response = requests.post(url, headers=headers, files={"image": image})
   response.raise_for_status()
