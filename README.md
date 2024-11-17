@@ -1,3 +1,7 @@
+## 1st Place Winner of the Inclusivity in Healthcare category
+
+Plate Check provides gender-specific, personalized nutritional insights to address nutrition gaps and improve women’s overall health.
+
 ![image](https://github.com/user-attachments/assets/ff14db3b-f649-4977-99e5-0109b6e8300a)
 ![image](https://github.com/user-attachments/assets/aa807468-3a5d-492b-8e8a-20abe860a876)
 ![image](https://github.com/user-attachments/assets/cf3b917c-fc08-4408-be75-b3999a08bf4f)
